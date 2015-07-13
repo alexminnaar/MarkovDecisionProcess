@@ -15,6 +15,7 @@
 using namespace boost::numeric::ublas;
 
 
+//Constructor intializing all member variables
 MDP::MDP(std::map<int,matrix<double> > at, matrix<double> ar,double d){
 	this->actionTransitions=at;
 	this->actionReward=ar;
@@ -23,7 +24,7 @@ MDP::MDP(std::map<int,matrix<double> > at, matrix<double> ar,double d){
 	this->numActions=at.size();
 }
 
-
+//reward for each state associated with this policy (given the action reward and transition matrix for this MDP)
 vector<double> MDP::policyReward(matrix<double> policy){
 
 	vector<double> v (this->actionReward.size1());
@@ -39,7 +40,7 @@ vector<double> MDP::policyReward(matrix<double> policy){
 	return v;
 }
 
-
+//transition matrix associated with this policy (given the transition matrix for this MDP)
 matrix<double> MDP::policyTransitions(matrix<double> policy){
 
 	matrix<double> ptp=zero_matrix<double> (3,3);
@@ -58,7 +59,7 @@ matrix<double> MDP::policyTransitions(matrix<double> policy){
 	return ptp;
 }
 
-
+//Compute the value function associated with a given policy
 vector<double> MDP::policyEvaluation(matrix<double> pTransProb, vector<double> pReward){
 
 	vector<double> valueFunction=zero_vector<double> (pReward.size());
@@ -72,6 +73,7 @@ struct actionValue{
 	double value;
 };
 
+//Greedy policy improvement given the current policy's value function
 matrix<double> MDP::policyImprovement(vector<double> valueFunction){
 
 	//int numStates=this.
