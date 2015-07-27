@@ -1,6 +1,8 @@
 /*
  * MDP.hpp
  *
+ *	An c++ implementation of a Markov Decision Process (MDP)
+ *
  *  Created on: Jul 12, 2015
  *      Author: alexminnaar
  */
@@ -15,7 +17,6 @@ using namespace boost::numeric::ublas;
 
 
 class MDP{
-
 
 private :
 	//mapping from action to probability transition matrix
@@ -32,7 +33,6 @@ private :
 
 	//Total number of actions in MDP
 	int numActions;
-
 
 public:
 
@@ -52,7 +52,5 @@ public:
 	matrix<double> policyImprovement(vector<double> valueFunction);
 
 };
-
-
 
 #endif /* MDP_HPP_ */
