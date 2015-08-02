@@ -45,8 +45,11 @@ public:
 	//transition matrix associated with this policy (given the transition matrix for this MDP)
 	matrix<double> policyTransitions(matrix<double> policy);
 
+	//compute the Bellman equation for the given parameters
+	vector<double> bellmanEquation(matrix<double> policyTrans, vector<double> policyRew, vector<double> valueFunc);
+
 	//Compute the value function associated with a given policy
-	vector<double> policyEvaluation(matrix<double> policyTrans, vector<double> policyRew);
+	vector<double> policyEvaluation(matrix<double> policyTrans, vector<double> policyRew, double epsilon);
 
 	//Greedy policy improvement given the current policy's value function
 	matrix<double> policyImprovement(vector<double> valueFunction);

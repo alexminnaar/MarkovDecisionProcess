@@ -58,13 +58,32 @@ matrix<double> MDP::policyTransitions(matrix<double> policy) {
 	return ptp;
 }
 
+//Compute the result of the Bellman equation
+vector<double> MDP::bellmanEquation(matrix<double> policyTrans,
+		vector<double> policyRew, vector<double> valueFunc) {
+	return policyRew + prod(policyTrans, valueFunc);
+}
+
 //Compute the value function associated with a given policy
 vector<double> MDP::policyEvaluation(matrix<double> pTransProb,
-		vector<double> pReward) {
+		vector<double> pReward, double epsilon) {
 
+	//Initialize value function to zero
 	vector<double> valueFunction = zero_vector<double>(pReward.size());
 
-	return pReward + prod(pTransProb, valueFunction);
+	int delta = 0;
+
+	while (delta < epsilon) {
+
+		vector<double> previousValueFunction = valueFunction;
+		valueFunction = bellmanEquation(pTransProb, pReward, valueFunction);
+
+		//Check for convergence
+		vector<double> diffVect = valueFunction - previousValueFunction;
+		delta = *std::max_element(diffVect.begin(), diffVect.end());
+	}
+
+	return valueFunction;
 }
 
 struct actionValue {

@@ -75,11 +75,8 @@ TEST_CASE("action policy matrix is computed","[policyTransitions]") {
 	for (int i = 0; i < correctPT.size1(); ++i) {
 		for (int j = 0; j < correctPT.size2(); ++j) {
 
-			double el1 = policyTrans(i, j);
-			double el2 = correctPT(i, j);
-
 			//truncate for minor differences
-			REQUIRE(floor(el1 * 10) / 10 == floor(el2 * 10) / 10);
+			REQUIRE(floor(policyTrans(i, j) * 10) / 10 == floor(correctPT(i, j) * 10) / 10);
 		}
 	}
 }
@@ -87,6 +84,7 @@ TEST_CASE("action policy matrix is computed","[policyTransitions]") {
 TEST_CASE("policy reward is computed","[policyReward]") {
 
 	MDP myMDP = createTestMDP();
+
 	//create test policy
 	double policy[3][2] = { 0.9, 0.1, 0.7, 0.3, 0.2, 0.8 };
 
@@ -102,4 +100,39 @@ TEST_CASE("policy reward is computed","[policyReward]") {
 	for (int i = 0; i < 3; ++i) {
 		REQUIRE(correct[i] == policyRew[i]);
 	}
+}
+
+TEST_CASE("the bellman equation is evaluated","[policyEvaluation]"){
+
+	MDP myMDP = createTestMDP();
+
+	//create test policy
+	double policy[3][2] = { 0.9, 0.1, 0.7, 0.3, 0.2, 0.8 };
+	matrix<double> A(3, 2);
+	A = make_matrix_from_pointer(policy);
+
+	//compute policy transition matrix
+	matrix<double> policyTrans = myMDP.policyTransitions(A);
+
+	//compute policy reward vector
+	vector<double> policyRew = myMDP.policyReward(A);
+
+	//create an initial value function needed for Bellman equation
+	double valueFunction[] = {0.3,0.2,1.1};
+	vector<double> vf(3);
+	vf=make_vector_from_pointer(3,valueFunction);
+
+	//compute result of Bellman equation
+	vector<double> bellman=myMDP.bellmanEquation(policyTrans,policyRew,vf);
+
+	//correct Bellman equation result
+	double correctVf[] = {1.747,0.792,1.012};
+	vector<double> correct(3);
+	correct=make_vector_from_pointer(3,correctVf);
+
+	for (int i = 0; i < 3; ++i) {
+		//truncate for minor differences
+		REQUIRE(floor(correct[i]*100)/100 == floor(bellman[i]*100)/100);
+	}
+
 }
