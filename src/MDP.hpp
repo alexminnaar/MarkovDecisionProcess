@@ -36,7 +36,7 @@ private :
 
 public:
 
-	//Constructor intializing all member variables
+	//Constructor initializing all member variables
 	MDP(std::map<int,matrix<double> > at, matrix<double> ar, double d);
 
 	//reward for each state associated with this policy (given the action reward and transition matrix for this MDP)

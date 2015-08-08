@@ -76,7 +76,9 @@ TEST_CASE("action policy matrix is computed","[policyTransitions]") {
 		for (int j = 0; j < correctPT.size2(); ++j) {
 
 			//truncate for minor differences
-			REQUIRE(floor(policyTrans(i, j) * 10) / 10 == floor(correctPT(i, j) * 10) / 10);
+			REQUIRE(
+					floor(policyTrans(i, j) * 10) / 10
+							== floor(correctPT(i, j) * 10) / 10);
 		}
 	}
 }
@@ -102,7 +104,7 @@ TEST_CASE("policy reward is computed","[policyReward]") {
 	}
 }
 
-TEST_CASE("the bellman equation is evaluated","[policyEvaluation]"){
+TEST_CASE("the bellman equation is evaluated","[policyEvaluation]") {
 
 	MDP myMDP = createTestMDP();
 
@@ -118,21 +120,72 @@ TEST_CASE("the bellman equation is evaluated","[policyEvaluation]"){
 	vector<double> policyRew = myMDP.policyReward(A);
 
 	//create an initial value function needed for Bellman equation
-	double valueFunction[] = {0.3,0.2,1.1};
+	double valueFunction[] = { 0.3, 0.2, 1.1 };
 	vector<double> vf(3);
-	vf=make_vector_from_pointer(3,valueFunction);
+	vf = make_vector_from_pointer(3, valueFunction);
 
 	//compute result of Bellman equation
-	vector<double> bellman=myMDP.bellmanEquation(policyTrans,policyRew,vf);
+	vector<double> bellman = myMDP.bellmanEquation(policyTrans, policyRew, vf);
 
 	//correct Bellman equation result
-	double correctVf[] = {1.747,0.792,1.012};
-	vector<double> correct(3);
-	correct=make_vector_from_pointer(3,correctVf);
+	double correctVf[] = { 1.42, 0.54, 0.6 };
 
 	for (int i = 0; i < 3; ++i) {
 		//truncate for minor differences
-		REQUIRE(floor(correct[i]*100)/100 == floor(bellman[i]*100)/100);
+		REQUIRE(
+				floor(correctVf[i] * 100) / 100
+						== floor(bellman[i] * 100) / 100);
+	}
+
+}
+
+TEST_CASE("a policy is evaluated","[policyEvaluation]") {
+
+	MDP myMDP = createTestMDP();
+
+	//create test policy
+	double policy[3][2] = { 0.9, 0.1, 0.7, 0.3, 0.2, 0.8 };
+	matrix<double> A(3, 2);
+	A = make_matrix_from_pointer(policy);
+
+	//compute policy transition matrix
+	matrix<double> policyTrans = myMDP.policyTransitions(A);
+
+	//compute policy reward vector
+	vector<double> policyRew = myMDP.policyReward(A);
+
+	//evaluated value function for policy
+	vector<double> vFunc = myMDP.policyEvaluation(policyTrans, policyRew,
+			0.001);
+
+	//correct value function
+	double correct[] = { 1.56313, 0.905347, 0.615901 };
+
+	for (int i = 0; i < 3; i++) {
+		//truncate for minor differences
+		REQUIRE(floor(correct[i] * 100) / 100 == floor(vFunc(i) * 100) / 100);
+	}
+
+}
+
+TEST_CASE("a policy is improved","[policyImprovement]") {
+
+	MDP myMDP = createTestMDP();
+
+	double vf[] = { 1.5, 0.9, 0.6 };
+
+	vector<double> valueFunction(3);
+	valueFunction = make_vector_from_pointer(3, vf);
+
+	matrix<double> improvedPolicy = myMDP.policyImprovement(valueFunction);
+
+	//correct improved policy
+	double correct[3][2] = { 0.0, 1.0, 0.0, 1.0, 1.0, 0.0 };
+
+	for (int i = 0; i < 3; i++) {
+		for (int j = 0; j < 2; j++) {
+			REQUIRE(improvedPolicy(i, j) == correct[i][j]);
+		}
 	}
 
 }

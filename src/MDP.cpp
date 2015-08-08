@@ -12,7 +12,7 @@
 
 using namespace boost::numeric::ublas;
 
-//Constructor intializing all member variables
+//Constructor initializing all member variables
 MDP::MDP(std::map<int, matrix<double> > at, matrix<double> ar, double d) {
 	this->actionTransitions = at;
 	this->actionReward = ar;
@@ -61,7 +61,8 @@ matrix<double> MDP::policyTransitions(matrix<double> policy) {
 //Compute the result of the Bellman equation
 vector<double> MDP::bellmanEquation(matrix<double> policyTrans,
 		vector<double> policyRew, vector<double> valueFunc) {
-	return policyRew + prod(policyTrans, valueFunc);
+
+	return policyRew + this->discount * prod(policyTrans, valueFunc);
 }
 
 //Compute the value function associated with a given policy
@@ -71,15 +72,22 @@ vector<double> MDP::policyEvaluation(matrix<double> pTransProb,
 	//Initialize value function to zero
 	vector<double> valueFunction = zero_vector<double>(pReward.size());
 
-	int delta = 0;
+	double delta = 10.0;
 
-	while (delta < epsilon) {
+	while (delta > epsilon) {
 
 		vector<double> previousValueFunction = valueFunction;
+
+		//compute value function via the Bellman equation
 		valueFunction = bellmanEquation(pTransProb, pReward, valueFunction);
 
 		//Check for convergence
 		vector<double> diffVect = valueFunction - previousValueFunction;
+
+		//get maximum element
+		vector<double>::iterator result;
+
+		//delta is most changed element (if it is small then convergence has occurred)
 		delta = *std::max_element(diffVect.begin(), diffVect.end());
 	}
 
@@ -105,9 +113,11 @@ matrix<double> MDP::policyImprovement(vector<double> valueFunction) {
 				this->actionTransitions.begin();
 				it != this->actionTransitions.end(); ++it) {
 
+			//compute the value associated with this action at this state
 			double value = inner_prod(row(it->second, i), valueFunction)
 					+ this->actionReward(i, it->first);
 
+			//select the greedy action in terms of value
 			if (value > greedyAction.value) {
 				greedyAction.action = it->first;
 				greedyAction.value = value;
@@ -115,7 +125,6 @@ matrix<double> MDP::policyImprovement(vector<double> valueFunction) {
 		}
 
 		greedyPolicy(i, greedyAction.action) = 1.0;
-
 	}
 
 	return greedyPolicy;
