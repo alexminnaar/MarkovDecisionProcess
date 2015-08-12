@@ -54,6 +54,9 @@ public:
 	//Greedy policy improvement given the current policy's value function
 	matrix<double> policyImprovement(vector<double> valueFunction);
 
+	//compute the optimal policy for this MDP (corresponding value function can be found using policyEvalution method)
+	matrix<double> policyIteration();
+
 };
 
 #endif /* MDP_HPP_ */

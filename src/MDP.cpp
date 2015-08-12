@@ -129,3 +129,34 @@ matrix<double> MDP::policyImprovement(vector<double> valueFunction) {
 
 	return greedyPolicy;
 }
+
+//compute the optimal policy for this MDP (corresponding value function can be found using policyEvalution method)
+matrix<double> MDP::policyIteration() {
+
+	//initialize with a random policy
+	matrix<double> currentPolicy = scalar_matrix<double>(this->numStates,
+			this->numActions);
+
+	currentPolicy = currentPolicy / (double) this->numActions;
+
+	matrix<double> oldPolicy = zero_matrix<double>(this->numStates,
+			this->numActions);
+
+	const double epsilon = std::numeric_limits<double>::epsilon();
+
+	while (!detail::equals(currentPolicy, oldPolicy, epsilon, epsilon)) {
+
+		oldPolicy = currentPolicy;
+
+		matrix<double> policyTrans = this->policyTransitions(currentPolicy);
+
+		vector<double> policyReward = this->policyReward(currentPolicy);
+
+		vector<double> policyValue = this->policyEvaluation(policyTrans,
+				policyReward, 0.001);
+
+		currentPolicy = this->policyImprovement(policyValue);
+	}
+
+	return currentPolicy;
+}

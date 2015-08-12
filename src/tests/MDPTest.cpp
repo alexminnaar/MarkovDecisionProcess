@@ -189,3 +189,22 @@ TEST_CASE("a policy is improved","[policyImprovement]") {
 	}
 
 }
+
+TEST_CASE("full policy iteration algorithm","[policyIteration]"){
+
+	MDP myMDP = createTestMDP();
+
+	matrix<double> optimalPolicy=myMDP.policyIteration();
+
+	std::cout<<optimalPolicy<<std::endl;
+
+	//correct improved policy
+	double correct[3][2] = { 0.0, 1.0, 0.0, 1.0, 1.0, 0.0 };
+
+	for (int i = 0; i < 3; i++) {
+		for (int j = 0; j < 2; j++) {
+			REQUIRE(optimalPolicy(i, j) == correct[i][j]);
+		}
+	}
+
+}
