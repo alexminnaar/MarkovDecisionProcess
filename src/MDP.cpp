@@ -40,7 +40,7 @@ vector<double> MDP::policyReward(matrix<double> policy) {
 //transition matrix associated with this policy (given the transition matrix for this MDP)
 matrix<double> MDP::policyTransitions(matrix<double> policy) {
 
-	matrix<double> ptp = zero_matrix<double>(3, 3);
+	matrix<double> ptp = zero_matrix<double>(this->numStates, this->numStates);
 
 	for (unsigned i = 0; i < policy.size1(); ++i) {
 
